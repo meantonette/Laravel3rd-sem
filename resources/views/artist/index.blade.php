@@ -26,7 +26,7 @@
         <td>{{$artist->id}}</td>
         <td>{{$artist->artist_name}}</td>
         <td>
-        @foreach($artist->albums as $album)
+        @foreach($artist->albums as $album) 
           <li>{{$album->album_name}} </li>  
         @endforeach
         </td>

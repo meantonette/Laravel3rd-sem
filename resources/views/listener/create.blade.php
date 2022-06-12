@@ -26,8 +26,6 @@
            <div class="form-check form-check-inline">
              {{ Form::checkbox('album_id[]',$album->id, null, array('class'=>'form-check-input','id'=>'album')) }} 
               {!!Form::label('album', $album->album_name. ' by '.$album->artist->artist_name ,array('class'=>'form-check-label')) !!}
-             
-             {!!Form::label('album', $album->album_name. ' by '.$album->artist->artist_name ,array('class'=>'form-check-label')) !!}
  </div> 
             
         @endforeach

@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use View;
-use Redirect;
-use DB;
-use App\Models\Artist;
 use App\Models\Album;
-
+use App\Models\Artist;
+use App\Models\Listener;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Redirect;
 
 
 
@@ -21,24 +22,17 @@ class ArtistController extends Controller
      */
     public function index()
     {
-        // $artists = Artist::all();
-
-        // $artists = DB::table('artists')->leftJoin('albums','artists.id','=','albums.artist_id')->get();
-
-        // $artists = DB::table('artists')
-        //     ->leftJoin('albums','artists.id','=','albums.artist_id')
-        //     ->select('artists.id','albums.album_name','artists.artist_name',
-        //     'artists.img_path')
-        //     ->get();
-
-        // return View::make('artist.index',compact('artists'));
-        // $albums = Album::with('artist')->orderBy('album_name', 'DESC')->get();
-
-        // return View::make('album.index', compact('albums'));
-
-
-        $artists = Artist::with('albums')->get();
-
+        $artists = Artist::with('albums')->orderBy('artist_name', 'DESC')->get();
+        // dd($artists);
+        // dump($artists);
+        // foreach ($artists as $artist) {
+        //     dump($artist);
+        //     dump($artist->artist_name);
+        //     dump($artist->albums); // ! lazy loaded with relationship one to many
+        //     foreach ($artist->albums as $album) {
+        //         dump($album->album_name);
+        //     }
+        // }
         return View::make('artist.index', compact('artists'));
     }
 
@@ -64,22 +58,20 @@ class ArtistController extends Controller
         // Artist::create($input);
         // return Redirect::to('artist');
 
-    
-       
+
+
         $input = $request->all();
+
         $request->validate([
             'image' => 'required|mimes:jpeg,png,jpg,gif,svg',
         ]);
-         if($file = $request->hasFile('image')) {
-            
-            $file = $request->file('image') ;
-            $fileName = uniqid().'_'.$file->getClientOriginalName();
-            // $fileName = $file->getClientOriginalName();
-            // dd($fileName);
+        if ($file = $request->hasFile('image')) {
+
+            $file = $request->file('image');
+            $fileName = uniqid() . '_' . $file->getClientOriginalName();
             $request->image->storeAs('images', $fileName, 'public');
-        $input['img_path'] = 'images/'.$fileName;
+            $input['img_path'] = 'images/' . $fileName;
             $artist = Artist::create($input);
-            
         }
         return Redirect::to('artist');
     }
@@ -103,10 +95,10 @@ class ArtistController extends Controller
      */
     public function edit($id)
     {
-       
-           $artist = Artist::find($id);
 
-           return View::make('artist.edit',compact('artist'));
+        $artist = Artist::find($id);
+
+        return View::make('artist.edit', compact('artist'));
     }
 
     /**
@@ -119,9 +111,9 @@ class ArtistController extends Controller
     public function update(Request $request, $id)
     {
         $artist = Artist::find($id);
-    
+
         $artist->update($request->all());
-        return Redirect::to('/artist')->with('success','Artist updated!');
+        return Redirect::to('/artist')->with('success', 'Artist updated!');
     }
 
     /**
@@ -132,17 +124,10 @@ class ArtistController extends Controller
      */
     public function destroy($id)
     {
-        // Album::where('artist_id',$id)->delete();
-        // $artist = Artist::find($id);
-        // File::delete('images/', $artist->img_path);
-        // Artist::destroy($id);
-        // return Redirect::to('/artist')->with('success','artist deleted!');
-
         $artist = Artist::find($id);
-
         $artist->albums()->delete();
-
         $artist->delete();
         $artist = Artist::with('albums')->get();
+        // ! Delete artist and album same time 
     }
 }

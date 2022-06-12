@@ -14,7 +14,7 @@ class Album extends Model
         return $this->belongsTo('App\Models\Artist');
    }
 
-   public function listeners()
+   public function listeners() // ! Belongs to many pag many to many
 	 {
 	 	return $this->belongsToMany('App\Models\Listener');
 	 }

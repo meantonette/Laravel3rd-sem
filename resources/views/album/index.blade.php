@@ -21,8 +21,8 @@
 <tr>
         <th>Album ID</th>
         <th>Album Cover</th>
-        <th>title</th>
         <th>Artist</th>
+        <th>listener</th>
         <th>Action</th>
        
         </tr>
