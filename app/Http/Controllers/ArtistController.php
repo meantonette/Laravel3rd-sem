@@ -11,6 +11,8 @@ Use App\Models\album;
 Use App\DataTables\ArtistsDataTable;
 use Illuminate\Support\Facades\DB;
 use Laravel\Ui\Presets\React;
+use Yajra\DataTables\Html\Builder;
+use Yajra\DataTables\Facades\DataTables;
 
 class ArtistController extends Controller
 {
@@ -18,10 +20,11 @@ class ArtistController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
+     * //2ndsemcode
      */
     public function index(Request $request)
     {
-        //2ndsemcode
+        
         //$artists = Artist::with('albums')->orderBy('artist_name', 'DESC')->get();
         // dd($artists);
         // dump($artists);
@@ -71,31 +74,16 @@ $artists = Artist::with(['albums' => function($q) use($request){
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+     //old code
     public function store(Request $request)
     {
-        // $input = $request->all();
-        // Artist::create($input);
-        // return Redirect::to('artist');
-
-
-
+       
         $input = $request->all();
+        // dd($input);
+        Artist::create($input);
 
-        $request->validate([
-            'image' => 'required|mimes:jpeg,png,jpg,gif,svg',
-        ]);
-        if ($file = $request->hasFile('image')) {
-
-            $file = $request->file('image');
-            $fileName = uniqid() . '_' . $file->getClientOriginalName();
-            // $fileName = $file->getClientOriginalName();
-            // dd($fileName);
-            $request->image->storeAs('images', $fileName, 'public');
-            $input['img_path'] = 'images/' . $fileName;
-            $artist = Artist::create($input);
-             // $file->move($destinationPath,$fileName);
-        }
-        return Redirect::to('artist');
+        return Redirect::to('artists');
     }
 
     /**
@@ -120,9 +108,12 @@ $artists = Artist::with(['albums' => function($q) use($request){
     public function edit($id)
     {
 
-        $artist = Artist::find($id);
+        // $artist = Artist::find($id);
+        // return View::make('artist.edit', compact('artist'));
 
-        return View::make('artist.edit', compact('artist'));
+        $artist = Artist::find($id);
+        // dd($artist);
+        return View::make('artist.edit',compact('artist'));
     }
 
     /**
@@ -134,10 +125,16 @@ $artists = Artist::with(['albums' => function($q) use($request){
      */
     public function update(Request $request, $id)
     {
-        $artist = Artist::find($id);
+        // $artist = Artist::find($id);
 
-        $artist->update($request->all());
-        return Redirect::to('/artist')->with('success', 'Artist updated!');
+        // $artist->update($request->all());
+        // return Redirect::to('/artist')->with('success', 'Artist updated!');
+
+        $artist = Artist::find($id);
+        // $album->artist_id = $request->artist_id;
+        $artist->artist_name = $request->artist_name;
+        $artist->save();
+        return Redirect::to('/artists')->with('success','Artist updated!');
     }
 
     /**
@@ -148,16 +145,56 @@ $artists = Artist::with(['albums' => function($q) use($request){
      */
     public function destroy($id)
     {
-        //old code
+       
         $artist = Artist::find($id);
+           // Album::where('artist_id',$artist->id)->delete();
+              //old code
         $artist->albums()->delete();
         $artist->delete();
         $artist = Artist::with('albums')->get();
+      
         // ! Delete artist and album same time 
+
+        return Redirect::to('/artists');
     }
 
-    public function getArtists(ArtistsDataTable $dataTable) {
-        // dd($dataTable);
-        return $dataTable->render('artist.artists');
-    }
+    // public function getArtists(ArtistsDataTable $dataTable) {
+    //     // dd($dataTable);
+    //     return $dataTable->render('artist.artists');
+    // }
+
+    public function getArtists(Builder $builder) {
+
+        //other methods
+        $artists = Artist::query();
+//eloquent builder
+
+      if (request()->ajax()) {
+
+            return DataTables::of($artists)
+                    //     ->order(function ($query) {
+                    //  $query->orderBy('updated_at', 'DESC');
+                    //  }) //permanent order na sya ng column, di mo magagamit yung sort arrow. naooverride
+             ->addColumn('action', function($row) {
+                    return "<a href=". route('artist.edit', $row->id). " class=\"btn btn-warning\">Edit</a>
+                    <form action=". route('artist.destroy', $row->id). " method= \"POST\" >". csrf_field() .
+                    '<input name="_method" type="hidden" value="DELETE">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                      </form>';
+                    })
+                    //->rawColumns(['action'])
+                     // ->make(true);
+                      ->toJson();
+         }
+        $html = $builder->columns([
+            ['data' => 'id', 'name' => 'id', 'title' => 'Id'],
+            ['data' => 'artist_name', 'name' => 'artist_name', 'title' => 'Name'],
+            ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
+            ['data' => 'updated_at', 'name' => 'updated_at', 'title' => 'Updated At'],
+            ['data' => 'action', 'name' => 'action', 'title' => 'Action', 'searchable' => false, 'orderable' => false, 'exportable' => false]
+//name - name sa table, title-name ng header
+            // ['data' => 'action', 'name' => 'action', 'title' => 'Action']
+        ]);
+return view('artist.artists', compact('html'));
+}
 }

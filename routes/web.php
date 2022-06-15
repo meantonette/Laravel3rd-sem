@@ -89,6 +89,7 @@ Route::get('/show-artist/{id}', [
 
   Route::get('/search/{search?}',['uses' => 'SearchController@search','as' => 'search'] );
 
+ // june 15--
   Route::get('/artists', [
 	'uses' => 'ArtistController@getArtists',
 	 'as' => 'getArtists'
