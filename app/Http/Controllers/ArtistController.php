@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Album;
-use App\Models\Artist;
-use App\Models\Listener;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
-
-
+Use App\Models\artist;
+Use App\Models\album;
+Use App\DataTables\ArtistsDataTable;
+use Illuminate\Support\Facades\DB;
+use Laravel\Ui\Presets\React;
 
 class ArtistController extends Controller
 {
@@ -20,9 +19,10 @@ class ArtistController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $artists = Artist::with('albums')->orderBy('artist_name', 'DESC')->get();
+        //2ndsemcode
+        //$artists = Artist::with('albums')->orderBy('artist_name', 'DESC')->get();
         // dd($artists);
         // dump($artists);
         // foreach ($artists as $artist) {
@@ -33,8 +33,27 @@ class ArtistController extends Controller
         //         dump($album->album_name);
         //     }
         // }
-        return View::make('artist.index', compact('artists'));
-    }
+
+ ///JUNE 8============
+ if (empty($request->get('search'))) {
+    // $artists = Artist::with('albums')->get();
+    $artists = Artist::has('albums')->get();
+    //ifefetech yung may related album
+
+    // dd($artists);
+}
+
+else 
+
+$artists = Artist::with(['albums' => function($q) use($request){
+    $q->where("genre","=",$request->get('search'))
+        ->orWhere("album_name","LIKE", "%".$request->get('search')."%");
+    }])->where("artist_name","LIKE", "%".$request->get('search')."%")
+    ->get();
+
+    $url = 'artist';
+    return View::make('artist.index',compact('artists','url'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -69,9 +88,12 @@ class ArtistController extends Controller
 
             $file = $request->file('image');
             $fileName = uniqid() . '_' . $file->getClientOriginalName();
+            // $fileName = $file->getClientOriginalName();
+            // dd($fileName);
             $request->image->storeAs('images', $fileName, 'public');
             $input['img_path'] = 'images/' . $fileName;
             $artist = Artist::create($input);
+             // $file->move($destinationPath,$fileName);
         }
         return Redirect::to('artist');
     }
@@ -85,6 +107,8 @@ class ArtistController extends Controller
     public function show($id)
     {
         //
+        $artists = Artist::all();
+        return View::make('artist.index',compact('artists'));
     }
 
     /**
@@ -124,10 +148,16 @@ class ArtistController extends Controller
      */
     public function destroy($id)
     {
+        //old code
         $artist = Artist::find($id);
         $artist->albums()->delete();
         $artist->delete();
         $artist = Artist::with('albums')->get();
         // ! Delete artist and album same time 
+    }
+
+    public function getArtists(ArtistsDataTable $dataTable) {
+        // dd($dataTable);
+        return $dataTable->render('artist.artists');
     }
 }

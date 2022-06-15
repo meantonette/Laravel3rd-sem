@@ -2,40 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Album;
-use App\Models\Artist;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
+use \App\Models\Album;
+use \App\Models\artist;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
-
+use Illuminate\Support\Facades\DB;
 
 class AlbumController extends Controller
 {
-    public function index()
-    { // TODO: Always use eager loading for relational database.
-        // $albums = album::all(); // ! No relations when dumping unlike with.
-        // $albums = Album::with('artist')->orderBy('album_name', 'DESC')->get();
-        $albums = Album::with('artist', 'listeners')->get();
-        // ! using with is eager loading 
-        // ? Difference of eager and lazy loaded is simple eager loading doesn't repeat the same id
-        foreach ($albums as $album) {
-            // dump($album->artist);
-            // dump($album->artist->artist_name); // !this is lazy loaded
-            // dump($album->listeners);
-            foreach ($album->listeners as $listener) {
-                dump($listener->listener_name);
-            }
+    public function index(Request $request)
+    { 
+        //Lesson
+        //Relationships ex 1 to many, many - many
+        //June 8 lesson -using like, search
+        if (empty($request->get('search'))) {
+            $albums = Album::with('artist','listeners')->get();
         }
+        else { 
+        $albums = Album::whereHas('artist', function($q) use($request) {
+            $q->where("artist_name","LIKE", "%".$request->get('search')."%");
+    })->orWhereHas('listeners', function($q) use($request){
+      $q->where("listener_name","LIKE", "%".$request->get('search')."%");
+    })->orWhere('album_name',"LIKE", "%".$request->get('search')."%")
+    ->get();
+ }
 
-        return View::make('album.index', compact('albums'));
+ $url = 'album';
+ return View::make('album.index',compact('albums','url'));
+
     }
+
+
     public function create()
     {
-        // return View::make('album.create');
-        $artists = Artist::pluck('artist_name', 'id');
-        return View::make('album.create', compact('artists'));
+       // return view::make('album.create');
+
+        $artists = Artist::pluck('artist_name','id');
+        //lahat ng artist kukunin ^^ 
+
+        return View::make('album.create',compact('artists'));
+        //kukunin yung artist
     }
 
     public function store(Request $request)
@@ -49,6 +56,7 @@ class AlbumController extends Controller
         $album->artist()->associate($artist);
         // ! Associate pag gusto ng relational without inner join
         // ? Use associate only for children not for parent
+    
         $request->validate([
             'image' => 'mimes:jpeg,png,jpg,gif,svg',
         ]);
@@ -63,23 +71,49 @@ class AlbumController extends Controller
         $album->save();
 
         return Redirect::to('/album')->with('success', 'New Album added!');
+        //2ndsemcode
+    }
+
+    public function show($id)
+    {
+        $albums = album::all();
+        return View::make('album.index',compact('albums'));
     }
 
     public function edit($id)
     {
 
+        $album = Album::find($id);
+
         // ! Eager Loading when using where and first.
+        //=====june 2
         $album = Album::with('artist')->where('id', $id)->first();
         // $album = Album::with('artist')->find($id)->first(); 
         // ! Don't use find in relationship.
+
+        // $albums = Album::with('artist')->where('id',$id)->take(1)->get();
+        // dd($album,$albums);
+        //$artist = Artist::where('id',$album->artist_id)->pluck('name','id');
+        // dd($album);
         $artists = Artist::pluck('artist_name', 'id');
-        return View::make('album.edit', compact('album', 'artists'));
+         //artist pluck kasi array yung id. isa isa kaya hindi select all gamit
+
+	    return View::make('album.edit',compact('album', 'artists'));
     }
 
 
 
     public function update(Request $request, $id)
     {
+
+    //dd($request);
+    //$album = Album::find($request->id);
+    //  $album = Album::find($id);
+    //  //dd($album,$request->all());
+    //  //dd($album,$request);
+    //  //dd($album);
+    //  $album->update($request->all());
+
         $artist = Artist::find($request->artist_id);
         // dd($artist);
         $album = Album::find($id);
@@ -93,9 +127,10 @@ class AlbumController extends Controller
     public function destroy($id)
     {
         $album = Album::find($id);
-        //   $album->listeners
+        $album->listeners()->detach();
         $album->delete();
-
-        return Redirect::to('/album')->with('success', 'Album deleted!');
+        
+        return Redirect::route('album.index')->with('success','Album deleted!');
+        //old code
     }
 }

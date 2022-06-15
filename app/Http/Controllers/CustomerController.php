@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Validator;
-use View;
-use App\Models\Customer;
-use Redirect;
+use App\Models\Customer; //tinawag via model
+use Illuminate\Support\Facades\View; //ginagamit ito para tawagin extension na ito
+use Illuminate\Support\Facades\Validator;// same dito
+use Illuminate\Support\Facades\Redirect;// and dito
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class CustomerController extends Controller
 {

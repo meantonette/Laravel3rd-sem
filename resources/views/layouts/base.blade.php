@@ -1,12 +1,15 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title></title>
-@include('layouts.header')
-
+ <html lang="en">
+ <head>
+ <meta charset="UTF-8">
+ <title></title>
 </head>
 <body>
-@yield('body')
-</body>
-</html>
+ @yield('body')
+ @include('layouts.header')
+
+<script src="{{ asset('vendor/datatables/buttons.server-side.js') }}"></script>
+ @stack('scripts')
+
+ </body>
+ </html>

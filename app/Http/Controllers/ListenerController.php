@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Album;
-use App\Models\Listener;
-use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
+Use App\Models\artist;
+Use App\Models\album;
+Use App\Models\listener;
 
 class ListenerController extends Controller
 {
@@ -16,15 +17,26 @@ class ListenerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $listeners = DB::table('listeners')
-            ->leftJoin('album_listener', 'listeners.id', '=', 'album_listener.listener_id')
-            ->leftJoin('albums', 'albums.id', '=', 'album_listener.album_id')
-            ->select('listeners.id', 'listeners.listener_name', 'albums.album_name')
-            ->get();
-        return View::make('listener.index', compact('listeners'));
-    }
+        //old code & June 8 code
+        if (empty($request->get('search'))) {
+            $listeners = Listener::with('albums')->get();
+        }
+    
+        else {
+
+            $listeners = Listener::whereHas('albums', function($q) use($request){
+                $q->where("album_name","LIKE", "%".$request->get('search')."%")
+                  ->orWhere("album_name","LIKE", "%".$request->get('search')."%");
+                  })->orWhere('listener_name',"LIKE", "%".$request->get('search')."%")
+              ->get();
+          }
+      
+          $url = 'listener';
+      
+         return View::make('listener.index',compact('listeners','url'));
+        }
 
     /**
      * Show the form for creating a new resource.
@@ -33,6 +45,11 @@ class ListenerController extends Controller
      */
     public function create()
     {
+        // checkbox gagamitin kasi maraming pagpipilian kaya PLUCK
+        // $albums = Album::pluck('album_name','id');
+        // // dd($albums);
+        // return View::make('listener.create',compact('albums'));
+
         $albums = Album::with('artist')->get();
         // dump($albums->artist->artist_name);  // ? needs to be loop if error is collection
         // foreach ($albums as $album) {
@@ -49,6 +66,8 @@ class ListenerController extends Controller
      */
     public function store(Request $request)
     {
+
+        //old and newcode
 
         $input = $request->all();
         // dd($request->album_id);
@@ -85,6 +104,7 @@ class ListenerController extends Controller
      */
     public function edit($id)
     {
+        //Old & new code, june 2
         $listener_albums = array();
         $listener = Listener::with('albums')->where('id', $id)->first();
         if (!(empty($listener->albums))) {
@@ -106,6 +126,8 @@ class ListenerController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //Old code
+
         $listener = Listener::find($id);
         $album_ids = $request->input('album_id');
         // dd($album_ids);
@@ -138,10 +160,12 @@ class ListenerController extends Controller
      */
     public function destroy($id)
     {
-        $Listener = Listener::find($id);
-        $Listener->albums()->detach();
-        $Listener->delete();
-
-        return Redirect::route('listener.index')->with('success', 'Listener deleted!');
+        $listener = Listener::find($id);
+        $listener->albums()->detach();
+        // DB::table('album_listener')->where('listener_id',$id)->delete();
+        
+        $listener->delete();
+     //   return Redirect::route('listener')->with('success','listener deleted!');
+        return Redirect::to('listener.index')->with('success','New listener deleted!');
     }
 }
