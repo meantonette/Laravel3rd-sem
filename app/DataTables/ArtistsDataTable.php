@@ -8,7 +8,7 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
-
+use Dompdf\Dompdf;
 class ArtistsDataTable extends DataTable
 {
     /**
@@ -57,12 +57,15 @@ class ArtistsDataTable extends DataTable
                     //r-processing display element, i-information summary
                     ->orderBy(1)
                     ->buttons(
-                        Button::make('create'),
-                        Button::make('export'),
-                        Button::make('print'),
+                        // Button::make('create'),
+                        // Button::make('export'),
+                        // Button::make('print'),
                         Button::make('reset'),
                         Button::make('reload')
-                    );
+                    )
+                   ->parameters([
+                        'buttons' => ['excel','pdf','csv'],
+                    ]);
     }
 
     /**

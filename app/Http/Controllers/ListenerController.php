@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Redirect;
 Use App\Models\artist;
 Use App\Models\album;
 Use App\Models\listener;
+use App\DataTables\ListenersDataTable;
+use PDF;
+use Barryvdh\Snappy;
+use Dompdf\Dompdf;
 
 class ListenerController extends Controller
 {
@@ -18,10 +22,12 @@ class ListenerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
+    //old code & June 8 code
     {
-        //old code & June 8 code
+        
         if (empty($request->get('search'))) {
             $listeners = Listener::with('albums')->get();
+        
         }
     
         else {
@@ -65,9 +71,8 @@ class ListenerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
+       //old and newcode
     {
-
-        //old and newcode
 
         $input = $request->all();
         // dd($request->album_id);
@@ -103,8 +108,9 @@ class ListenerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
+     //Old & new code, june 2
     {
-        //Old & new code, june 2
+       
         $listener_albums = array();
         $listener = Listener::with('albums')->where('id', $id)->first();
         if (!(empty($listener->albums))) {
@@ -124,9 +130,10 @@ class ListenerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+     //Old code
     public function update(Request $request, $id)
     {
-        //Old code
+       
 
         $listener = Listener::find($id);
         $album_ids = $request->input('album_id');
@@ -166,6 +173,13 @@ class ListenerController extends Controller
         
         $listener->delete();
      //   return Redirect::route('listener')->with('success','listener deleted!');
-        return Redirect::to('listener.index')->with('success','New listener deleted!');
+        return Redirect::to('getListeners')->with('success','New listener deleted!');
+    }
+
+    public function getListeners(ListenersDataTable $dataTable)
+    {
+        //eager loaded albums
+        $albums = Album::with('artist')->get();
+        return $dataTable->render('listener.listeners', compact('albums'));
     }
 }

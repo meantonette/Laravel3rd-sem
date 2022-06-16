@@ -7,15 +7,20 @@
     "require": {
         "php": "^7.3|^8.0",
         "barryvdh/laravel-debugbar": "^3.6",
+        "barryvdh/laravel-dompdf": "^1.0",
+        "barryvdh/laravel-snappy": "^1.0",
+        "dompdf/dompdf": "^1.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
+        "laravel/helpers": "^1.5",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
         "laravelcollective/html": "^6.3",
         "spatie/laravel-searchable": "^1.11",
         "yajra/laravel-datatables": "1.5"
+       
     },
     "require-dev": {
         "facade/ignition": "^2.5",

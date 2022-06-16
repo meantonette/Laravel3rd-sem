@@ -95,6 +95,17 @@ Route::get('/show-artist/{id}', [
 	 'as' => 'getArtists'
   ]);
 
+//june 16--
+Route::get('/listeners', [
+	'uses' => 'ListenerController@getListeners',
+	 'as' => 'getListeners'
+  ]);
+
+  Route::get('/albums', [
+	'uses' => 'AlbumController@getAlbums',
+	 'as' => 'getAlbums'
+  ]);
+//----
 // Route::get('/', function () {
 //     return view('welcome');
 // });

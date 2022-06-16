@@ -8,6 +8,7 @@ use \App\Models\artist;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\DB;
+use App\DataTables\AlbumsDataTable;
 
 class AlbumController extends Controller
 {
@@ -133,4 +134,14 @@ class AlbumController extends Controller
         return Redirect::route('album.index')->with('success','Album deleted!');
         //old code
     }
+
+    public function getAlbums(AlbumsDataTable $dataTable)
+    {   
+       
+        $albums =  Album::with(['artist','listeners'])->get();
+
+        return $dataTable->render('album.albums');
+
+    }
+    
 }
