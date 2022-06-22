@@ -13,6 +13,21 @@
 <div><button type="button" class="btn btn-sm" data-toggle="modal" data-target="#artistModal">
   create new artist
 </button></div>
+
+
+<div class="col-xs-6">
+  <form method="post" enctype="multipart/form-data" action="{{ url('/artist/import') }}">
+     @csrf
+     <input type="file" id="uploadName" name="artist_upload" required>
+ </div>
+ 
+   @error('artist_upload')
+     <small>{{ $message }}</small>
+   @enderror
+        <button type="submit" class="btn btn-info btn-primary " >Import Excel File</button>
+        </form> 
+ </div>
+ 
   <div >
     {{$html->table(['class' => 'table table-bordered table-striped table-hover '], true)}}
   </div>
@@ -44,7 +59,7 @@
         </form>
 </div>
     </div>
-    
+
   </div>
   @push('scripts')
     {{$html->scripts()}}

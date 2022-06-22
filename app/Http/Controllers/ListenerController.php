@@ -13,6 +13,9 @@ use App\DataTables\ListenersDataTable;
 use PDF;
 use Barryvdh\Snappy;
 use Dompdf\Dompdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ListenerImport;
+use App\rules\excelrule;
 
 class ListenerController extends Controller
 {
@@ -181,5 +184,15 @@ class ListenerController extends Controller
         //eager loaded albums
         $albums = Album::with('artist')->get();
         return $dataTable->render('listener.listeners', compact('albums'));
+    }
+
+    public function import(Request $request) {
+        
+        $request->validate([
+                'listener_upload' => ['required', new ExcelRule($request->file('listener_upload'))],
+        ]);
+        // dd($request);
+        Excel::import(new listenerImport, request()->file('listener_upload'));
+return redirect()->back()->with('success', 'Excel file Imported Successfully');
     }
 }

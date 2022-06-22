@@ -12,6 +12,22 @@
 <div><button type="button" class="btn btn-sm" data-toggle="modal" data-target="#listenerModal">
   create new Listener
 </button></div>
+
+<div class="col-xs-6">
+  <form method="post" enctype="multipart/form-data" action="{{ url('/listener/import') }}">
+     @csrf
+   <input type="file" id="uploadName" name="listener_upload" required>
+   
+</div>
+
+@error('listener_upload')
+ <small>{{ $message }}</small>
+@enderror
+    <button type="submit" class="btn btn-info btn-primary " >Import Excel File</button>
+    </form> 
+</div>
+
+
   <div >
     {{$dataTable->table(['class' => 'table table-bordered table-striped table-hover '], true)}}
   </div>
@@ -24,7 +40,7 @@
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
- 
+
 <form method="post" action="{{url('listener')}}" >
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">

@@ -19,6 +19,7 @@
         "laravel/ui": "^3.4",
         "laravelcollective/html": "^6.3",
         "spatie/laravel-searchable": "^1.11",
+        "maatwebsite/excel": "^3.1",
         "yajra/laravel-datatables": "1.5"
        
     },

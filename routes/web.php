@@ -106,10 +106,16 @@ Route::get('/listeners', [
 	 'as' => 'getAlbums'
   ]);
 //----
+
+//june 22----
+Route::post('/artist/import', 'ArtistController@import')->name('artistImport');
+Route::post('/listener/import', 'ListenerController@import')->name('listenerImport');
+Route::post('/album/import', 'AlbumController@import')->name('albumImport');
+
+
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-
 
 // Route::get('/db2', function() {
 //     $game = new \App\Models\Game;
@@ -180,8 +186,10 @@ Route::get('/listeners', [
 
 //  Route::get('/customer/restore/{id}',['uses' => 'CustomerController@restore','as' => 'customer.restore']);
 
-Route::get('/images/customer/{filename}','CustomerController@displayImage')
-->name('image.displayImage');
+// Route::get('/images/customer/{filename}','CustomerController@displayImage')
+// ->name('image.displayImage');
+
+
 
 //  Route::resource('customer','CustomerController')->middleware('auth');
 // // Route::resource('customer','CustomerController');
@@ -207,6 +215,7 @@ Route::get('/images/customer/{filename}','CustomerController@displayImage')
 // Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
 
 
 

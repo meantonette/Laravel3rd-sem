@@ -13,14 +13,19 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Ui\Presets\React;
 use Yajra\DataTables\Html\Builder;
 use Yajra\DataTables\Facades\DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ArtistImport;
+use App\rules\excelrule;
 
 class ArtistController extends Controller
 {
     /**
+     *   * //2ndsemcode
      * Display a listing of the resource.
      *
+     * 
      * @return \Illuminate\Http\Response
-     * //2ndsemcode
+   
      */
     public function index(Request $request)
     {
@@ -70,12 +75,13 @@ $artists = Artist::with(['albums' => function($q) use($request){
 
     /**
      * Store a newly created resource in storage.
+     *  //old code
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
 
-     //old code
+    
     public function store(Request $request)
     {
        
@@ -142,13 +148,15 @@ $artists = Artist::with(['albums' => function($q) use($request){
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
+     *     //old code
      */
     public function destroy($id)
     {
        
+       
         $artist = Artist::find($id);
            // Album::where('artist_id',$artist->id)->delete();
-              //old code
+           
         $artist->albums()->delete();
         $artist->delete();
         $artist = Artist::with('albums')->get();
@@ -157,7 +165,7 @@ $artists = Artist::with(['albums' => function($q) use($request){
 
         return Redirect::to('/artists');
     }
-
+//other methods
     // public function getArtists(ArtistsDataTable $dataTable) {
     //     // dd($dataTable);
     //     return $dataTable->render('artist.artists');
@@ -165,7 +173,7 @@ $artists = Artist::with(['albums' => function($q) use($request){
 
     public function getArtists(Builder $builder) {
 
-        //other methods
+        
         $artists = Artist::query();
 //eloquent builder
 
@@ -197,4 +205,15 @@ $artists = Artist::with(['albums' => function($q) use($request){
         ]);
 return view('artist.artists', compact('html'));
 }
+
+public function import(Request $request) {
+        
+         $request->validate([
+        'artist_upload' => ['required', new ExcelRule($request->file('artist_upload'))],
+    ]);
+        // dd($request);
+        Excel::import(new ArtistImport, request()->file('artist_upload'));
+        
+        return redirect()->back()->with('success', 'Excel file Imported Successfully');
+    }
 }
