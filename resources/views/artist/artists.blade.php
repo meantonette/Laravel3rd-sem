@@ -10,10 +10,48 @@
       </div><br />
      @endif
   </div>
+
+<button type="button" class="btn btn-sm" data-toggle="modal" data-target="#emailModal">Contact Us
+</button>
+<div class="modal" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="myemailLabel" aria-hidden="true">
+<div class="modal-dialog" role="document" style="width:75%;">
+  <div class="modal-content">
+    <div class="modal-header text-center">
+      <p class="modal-title w-100 font-weight-bold">Contact Us</p>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    
+<form  method="POST" action="{{url('contact')}}">
+    {{csrf_field()}}
+      
+    <div class="modal-body mx-3" id="mailModal">
+      <div class="md-form mb-5">
+        <i class="fas fa-user prefix grey-text"></i>
+        <label data-error="wrong" data-success="right" for="name" style="display: inline-block;
+      width: 150px; ">Send Email</label>
+<input type="text" id="sender" class="form-control validate" name="sender" placeholder="your name">
+        <input type="text" id="title" class="form-control validate" name="title" placeholder="title">
+        <textarea class="form-control validate" name="body" placeholder="Your message"></textarea>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button type="submit" class="btn btn-success">Send </button>
+        {{-- <button class="btn btn --}}
+        
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<br>
+
 <div><button type="button" class="btn btn-sm" data-toggle="modal" data-target="#artistModal">
   create new artist
 </button></div>
-
+<br>
 
 <div class="col-xs-6">
   <form method="post" enctype="multipart/form-data" action="{{ url('/artist/import') }}">
@@ -42,7 +80,8 @@
    <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form  method="POST" action="{{url('artist')}}">
+
+<form  method="POST" action="{{url('artist')}}">
         {{csrf_field()}}
           
         <div class="modal-body mx-3" id="inputfacultyModal">

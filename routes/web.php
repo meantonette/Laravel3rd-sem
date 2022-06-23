@@ -110,7 +110,10 @@ Route::get('/listeners', [
 //june 22----
 Route::post('/artist/import', 'ArtistController@import')->name('artistImport');
 Route::post('/listener/import', 'ListenerController@import')->name('listenerImport');
+
+//june 23--
 Route::post('/album/import', 'AlbumController@import')->name('albumImport');
+Route::post('/contact',['uses' => 'MailController@contact','as' => 'contact']);
 
 
 // Route::get('/', function () {

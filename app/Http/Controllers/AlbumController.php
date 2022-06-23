@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\DB;
 use App\DataTables\AlbumsDataTable;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\AlbumImport;
+use App\Imports\AlbumArtistListenerImport;
+use App\rules\excelrule;
 
 class AlbumController extends Controller
 {
@@ -143,5 +147,18 @@ class AlbumController extends Controller
         return $dataTable->render('album.albums');
 
     }
+
+   
+public function import(Request $request) {
+        
+    $request->validate([
+       'album_upload' => ['required', new ExcelRule($request->file('album_upload'))],
+   ]);
+   // dd($request);
+   // Excel::import(new AlbumImport, request()->file('album_upload')); //AlbumImport
+Excel::import(new AlbumArtistListenerImport, request()->file('album_upload')); //FirstSheetImport
+   
+   return redirect()->back()->with('success', 'Excel file Imported Successfully');
+}
     
 }
