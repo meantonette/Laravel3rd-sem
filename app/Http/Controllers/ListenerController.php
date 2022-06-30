@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+ //old code & June 8 code-index
+    //old and newcode-store
+         //Old & new code, june 2-edit
+   //Old code-update
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
@@ -16,6 +21,8 @@ use Dompdf\Dompdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ListenerImport;
 use App\rules\excelrule;
+use App\Events\SendMail;
+use Illuminate\Support\Facades\Event;
 
 class ListenerController extends Controller
 {
@@ -25,7 +32,7 @@ class ListenerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    //old code & June 8 code
+   
     {
         
         if (empty($request->get('search'))) {
@@ -74,23 +81,19 @@ class ListenerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-       //old and newcode
+    
     {
 
+     //june 29
         $input = $request->all();
-        // dd($request->album_id);
+        $input['password'] = bcrypt($request->password);
         $listener = Listener::create($input);
-        if (!(empty($request->album_id))) {
-            foreach ($request->album_id as $album_id) {
-                // DB::table('album_listener')->insert(
-                //     ['album_id' => $album_id, 
-                //      'listener_id' => $listener->id]
-                //     );
-                // dd($listener->albums());
-                $listener->albums()->attach($album_id);
-            } // ? attach para di na need tawagin isang table aattach n lang table agad mismo
-        }
-        return Redirect::to('listener')->with('success', 'New listener added!');
+        Event::dispatch(new SendMail($listener));
+        if(!(empty($request->album_id))){
+                $listener->albums()->attach($request->album_id);
+          }
+        return Redirect::route('getListeners')->with('success','listener created!');
+        
     }
 
     /**
@@ -111,7 +114,7 @@ class ListenerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-     //Old & new code, june 2
+
     {
        
         $listener_albums = array();
@@ -133,10 +136,10 @@ class ListenerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-     //Old code
+  
     public function update(Request $request, $id)
     {
-       
+       //pwede gumamit ng laravel fire
 
         $listener = Listener::find($id);
         $album_ids = $request->input('album_id');
@@ -176,7 +179,7 @@ class ListenerController extends Controller
         
         $listener->delete();
      //   return Redirect::route('listener')->with('success','listener deleted!');
-        return Redirect::to('getListeners')->with('success','New listener deleted!');
+        return Redirect::to('listeners')->with('success','New listener deleted!');
     }
 
     public function getListeners(ListenersDataTable $dataTable)

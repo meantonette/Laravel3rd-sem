@@ -6,11 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Listener extends Model implements Searchable
+// class Listener extends Model implements Searchable
+class Listener extends Authenticatable implements Searchable
 {
     use HasFactory;
-    protected $fillable = ['listener_name'];
+    public $remember_token = false;
+
+    // protected $fillable = ['listener_name'];
+    protected $fillable = ['listener_name','email','password'];
 
     public function albums()
 	{
@@ -28,4 +33,8 @@ class Listener extends Model implements Searchable
             );
      }
 
+     public static $auth_rules = [
+        'username' => 'required',
+        'password' => 'required'
+    ];
 }

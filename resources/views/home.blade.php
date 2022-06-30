@@ -9,9 +9,13 @@
  <p>We have a template!</p>
  @stop --}}
 
+{{-- listener layout --}}
+ {{-- @extends('layouts.app') --}}
+ {{-- @section('content') --}}
 
- @extends('layouts.app')
-@section('content')
+ {{-- listeners layout--}}
+ @extends('layouts.base')
+@section('body')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">

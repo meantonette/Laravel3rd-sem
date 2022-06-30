@@ -1,6 +1,7 @@
 {{-- old code --}}
 
 @extends('layouts.base')
+
 @section('body')
   <div class="container">
     <br />
